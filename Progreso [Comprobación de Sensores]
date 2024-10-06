@@ -1,0 +1,74 @@
+// Daniel Felipe Gomez Hernande // Comprobacion de MPU 6500 Giroscopio y Acelerometro:
+
+// Incluye la biblioteca para comunicación I2C
+#include <Wire.h> 
+// Dirección del sensor MPU-6500
+const int MPU = 0x68; 
+// Variables para guardar los datos del sensor
+int16_t AcX, AcY, AcZ, GyX, GyY, GyZ;
+
+void setup() {
+  Wire.begin(); // Inicia la comunicación I2C
+  Wire.beginTransmission(MPU); // Comienza la comunicación con el sensor
+  Wire.write(0x6B); // Accede al registro de energía del sensor
+  Wire.write(0); // Activa el sensor
+  Wire.endTransmission(true); // Termina la comunicación
+  Serial.begin(9600); // Inicia la comunicación serial para enviar datos a la computadora
+}
+
+void loop() {
+  // Comienza la comunicación para leer los datos del sensor
+  Wire.beginTransmission(MPU);
+ // Indica que queremos leer desde el registro 0x38
+  Wire.write(0x38);
+ // Termina la comunicación pero mantiene la conexión
+  Wire.endTransmission(false);
+// Pide 14 registros del sensor
+  Wire.requestFrom(MPU, 14, true); 
+
+  // Lee los datos del acelerómetro y giroscopio
+  AcX = Wire.read() << 8 | Wire.read(); // Lee el valor del acelerómetro en X
+  AcY = Wire.read() << 8 | Wire.read(); // Lee el valor del acelerómetro en Y
+  AcZ = Wire.read() << 8 | Wire.read(); // Lee el valor del acelerómetro en Z
+  GyX = Wire.read() << 8 | Wire.read(); // Lee el valor del giroscopio en X
+  GyY = Wire.read() << 8 | Wire.read(); // Lee el valor del giroscopio en Y
+  GyZ = Wire.read() << 8 | Wire.read(); // Lee el valor del giroscopio en Z
+
+  // Muestra los valores en la pantalla de la computadora
+  Serial.print("Acelerómetro: ");
+  Serial.print("X = "); Serial.print(AcX);
+  Serial.print(" | Y = "); Serial.print(AcY);
+  Serial.print(" | Z = "); Serial.println(AcZ);
+
+  Serial.print("Giroscopio: ");
+  Serial.print("X = "); Serial.print(GyX);
+  Serial.print(" | Y = "); Serial.print(GyY);
+  Serial.print(" | Z = "); Serial.println(GyZ);
+
+// Espera medio segundo antes de leer de nuevo
+  delay(500); 
+
+}
+
+// Estoy teniendo un problema con la ejecución del programa, ya que no obtengo las coordenadas exactas del MPU-6500. Solo obtengo los siguientes valores 
+Acelerómetro: X = -1 | Y = -1 | Z = -1, Giroscopio: X = -1 | Y = -1 | Z = -1, He intentado varios métodos de conexión para verificar si el problema está
+en la conexión entre el Arduino y la protoboard, pero no funcionó. No he podido encontrar la solución a este problema.
+
+
+// Comprobacion de los sensores flex:
+
+void setup() {
+
+// Inicia la comunicación serie a 9600 baudios
+  Serial.begin(9600); 
+// Configura el pin A0 como entrada
+  pinMode(A0, INPUT); 
+
+}
+
+void loop() {
+  int sensorValue = analogRead(A0); // Lee el valor del pin A0
+  Serial.print("Valor del sensor flex: "); // Imprime el texto en el monitor serie
+  Serial.println(sensorValue); // Imprime el valor del sensor en el monitor serie
+  delay(500); // Espera 0.5 segundos
+}
